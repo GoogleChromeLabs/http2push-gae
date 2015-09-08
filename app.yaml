@@ -1,0 +1,64 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+  secure: always
+
+#- url: /$
+#  static_files: static/index.html
+#  upload: static/index.html
+  #http_headers:
+  #  X-Associated-Content: '"/js/app.js": 0'
+
+- url: /css/slowfile.css
+  script: main.app
+  secure: always
+
+- url: /css
+  static_dir: static/css
+  secure: always
+
+- url: /js
+  static_dir: static/js
+  secure: always
+
+- url: /bower_components
+  static_dir: static/bower_components
+  secure: always
+
+- url: /elements.html
+  static_files: static/elements.html
+  upload: static/elements.html
+  secure: always
+
+- url: /elements.vulcanize.html
+  static_files: static/elements.vulcanize.html
+  upload: static/elements.vulcanize.html
+  secure: always
+
+- url: .*
+  script: main.app
+  secure: always
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?bower\.json
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.bak$
+- ^(.*/)?node_modules/.*
+- ^.*.md|markdown
