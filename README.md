@@ -53,14 +53,30 @@ Pushed resoures will show a `HTTP2_STREAM_ADOPTED_PUSH_STREAM` in the report.
 ## Generating a push manifest
 
 The `scripts` folder contains `generate_push_manifest.js`, a script for generating
-a JSON file (manifest) listing all of your page's static resources. This is not required
-by the HTTP2 protocol but the file useful for constructing the `X-Associated-Content` header.
+a JSON file (manifest) listing all of your page's static resources. **This file is not required
+by the HTTP2 protocol** but is useful for constructing the `X-Associated-Content` header
+on your server.
 
-Running `generate_push_manifest.js` will generate `push_mainfest.json` in the top
-level directory. This file is used by the reference server to constructor the `X-Associated-Content` header.
-Right now, all resources are instructed to be priority 1.
+Running `generate_push_manifest.js` will generate `push_manifest.json` in the top
+level directoryL
 
-Even easier is to use builds.sh! Run the following script to vulcanize the app and generate `push_mainfest.json`:
+    {
+      "/css/app.css": 1,
+      "/js/app.js": 1,
+      "/bower_components/webcomponentsjs/webcomponents-lite.js": 1,
+      "/bower_components/iron-selector/iron-selection.html": 1,
+      ...
+      "/elements.html": 1,
+      "/elements.vulcanize.html": 1
+    }
+
+This file is used by the reference server to constructor the `X-Associated-Content` header.
+The server reads this file, appends the URL origin (to make an absolute URL),
+and servers the index.html page with with the constructed `X-Associated-Content` header.
+
+### Build it!
+
+Run the following script to vulcanize your app and generate `push_manifest.json`:
 
     ./scripts/build.sh
 
