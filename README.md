@@ -7,6 +7,8 @@ for push resources.
 
 Demo: https://http20-experiment.appspot.com/
 
+![Effects of HTTP2 push perforamnce](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg)
+
 ## Requirements & Setup
 
 1. Download the [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll need the dev server.
