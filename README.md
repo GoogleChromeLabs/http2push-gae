@@ -9,6 +9,17 @@ Demo: https://http20-experiment.appspot.com/
 
 ![Effects of HTTP2 push perforamnce](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg)
 
+### Perf results
+
+Full [WebPageTest results](http://www.webpagetest.org/video/compare.php?tests=150827_DY_13KF-l%3Anopush%2C150826_KA_1928-l%3Avulcanize%2C150826_YH_16K7-l%3Apush%2C150826_GQ_190C-l%3Avulcanize+(push)&thumbSize=100&ival=100&end=visual)
+
+TL;DR;
+
+- HTTP2 push means we no longer need to concat all our JS/CSS together in one file! This reduces the amount of required tooling to make a great, fast web app.
+- In my testing, the browser can handle smaller, indvidual files better than one large file. More testing needs to be done here, but the initial results are promising.
+- For HTML Import resources, we no longer need to run `vulcanize` (crushes subimports into a single file). In testing, the latter is actually slower. Boom!
+- In a world of web components, authors write components in a modular way using HTML Imports, a bit of CSS/JS, and markup. Push means we can ship our code _exactly_ as it was authored, minimizing the differences between dev and code shipped to production.
+
 ## Requirements & Setup
 
 1. Download the [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll need the dev server.
