@@ -5,6 +5,8 @@ push on Google App Engine. It also contains a script for generating a list of
 static resources on a site, which is useful for generating the necessary HTTP header
 for push resources.
 
+Demo: https://http20-experiment.appspot.com/
+
 ## Requirements & Setup
 
 1. Download the [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll need the dev server.
