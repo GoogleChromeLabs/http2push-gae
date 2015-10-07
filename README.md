@@ -48,17 +48,26 @@ To verify resources are being pushed on production GAE:
 3. Reload your app URL
 4. Go back to `chrome://net-internals` and drill into your app.
 
-Pushed resoures will show a `HTTP2_STREAM_ADOPTED_PUSH_STREAM` in the report.
+Pushed resources will show a `HTTP2_STREAM_ADOPTED_PUSH_STREAM` in the report.
 
 ## Generating a push manifest
 
 The `scripts` folder contains `generate_push_manifest.js`, a script for generating
-a JSON file (manifest) listing all of your page's static resources. **This file is not required
+a JSON file (manifest) listing all of your app's static resources. **This file is not required
 by the HTTP2 protocol** but is useful for constructing the `X-Associated-Content` header
 on your server.
 
-Running `generate_push_manifest.js` will generate `push_manifest.json` in the top
-level directoryL
+**Example** - list all the tatic resources of `static/index.html`, include sub-HTML Imports:
+
+    node ./scripts/generate_push_manifest.js static index.html
+
+**Example** - list all the subimports in `static/elements/elements.html`:
+
+    node ./scripts/generate_push_manifest.js static/elements elements.html
+
+The script generates `push_manifest.json` in the top level directory with a
+mapping of `<URL>: <PUSH_PRIORITY>`. Feel free to add/remove URLs as necessary
+or change the priority level.
 
     {
       "/css/app.css": 1,
@@ -70,9 +79,10 @@ level directoryL
       "/elements.vulcanize.html": 1
     }
 
-This file is used by the reference server to constructor the `X-Associated-Content` header.
-The server reads this file, appends the URL origin (to make an absolute URL),
-and servers the index.html page with with the constructed `X-Associated-Content` header.
+This file can be loaded by your server to constructor the `X-Associated-Content` header.
+
+That's what the sample GAE server does! It reads `push_manifest.json` and servers
+index.html with with the constructed `X-Associated-Content` header.
 
 ### Build it!
 
