@@ -22,7 +22,7 @@ limitations under the License.
 
   <link rel="stylesheet" href="/css/app.css">
 
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js" async></script>
   {% if vulcanize %}
     <link rel="import" href="/elements.vulcanize.html">
   {% else %}
@@ -31,24 +31,53 @@ limitations under the License.
 </head>
 <body>
 
-<h2>What perf effect does HTTP 2 server push have on critical CSS/JS and HTML Import loading?</h2>
+<header>
+  <h1>HTTP2 push demo</h1>
+  <h2>what effect does server push have on critical CSS/JS and HTML Import loading perf?</h2>
+</header>
 
-<h3>Ways to run this app:</h3>
+<section>
+  <div class="about">
+<h3>For this app, pushing resources reduced total load time  by ~60%!</h3>
+
 <ul>
-  <li><a href="/">/</a> - push all static resources</li>
-  <li><a href="?nopush">?nopush</a> - no push</li>
-  <li><a href="?vulcanize">?vulcanize</a> - flattened html imports, push all static resources</li>
-  <li><a href="?vulcanize&nopush">?vulcanize&nopush</a> - flattened imports, no push</li>
+<li>Push means we no longer need to concatenate all JS/CSS together in one file! This reduces the amount of tooling to make a great, fast web app.</li>
+<li>The browser appears to handle smaller, individual files better than one large file. More testing needs to be done here, but the initial results are promising.</li>
+<li><a href="http://www.html5rocks.com/en/tutorials/webcomponents/imports/">HTML Import resources</a> no longer need to be <a href="https://github.com/polymer/vulcanize">vulcanized</a> to crush sub-imports into a single file. In testing, the latter (large single file of JS/HTML/CSS) is slower. Boom!</li>
+<li>In a world of web components, authors write components in a modular way using HTML Imports, a bit of CSS/JS, and markup. Push means we can ship our code exactly as it was authored, minimizing the differences between dev and prod.</li>
 </ul>
 
-Component (iron-selector) demo:
-<ul>
-<iron-selector>
-  <li>One</li>
-  <li>Two</li>
-  <li>Three</li>
-</iron-selector>
-</ul>
+</div>
+  <div>
+    <a href="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg" target="_blak"><img src="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg" alt="Server push results"></a>
+  </div>
+</section>
+
+<section>
+<div>
+  <h3>Ways to run this app:</h3>
+  <ol>
+    <li><a href="/">/</a> - push all static resources for this page</li>
+    <li><a href="?nopush">?nopush</a> - no push</li>
+    <li><a href="?vulcanize">?vulcanize</a> - flattened html imports, push all static resources</li>
+    <li><a href="?vulcanize&nopush">?vulcanize&nopush</a> - flattened imports, no push</li>
+  </ol>
+</div>
+<!-- <div>
+  <h3>Verify the <code>&lt;iron-selector></code> component loaded and is working:</h3>
+  <ul>
+  <iron-selector>
+    <li>One</li>
+    <li>Two</li>
+    <li>Three</li>
+  </iron-selector>
+  </ul>
+</div> -->
+</section>
+
+<footer>
+  <a href="https://github.com/GoogleChrome/http2push-gae/issues">File a bug</a> or ping <a href="https://twitter.com/ebidel">Eric Bidelman</a> for questions. See full <a href="http://www.webpagetest.org/video/compare.php?tests=150827_DY_13KF-l%3Anopush%2C150826_KA_1928-l%3Avulcanize%2C150826_YH_16K7-l%3Apush%2C150826_GQ_190C-l%3Avulcanize+(push)&thumbSize=100&ival=100&end=visual" target="_blank">WebPageTest</a> results.
+</footer>
 
 <script src="/js/app.js"></script>
 </body>
