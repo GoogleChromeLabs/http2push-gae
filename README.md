@@ -2,9 +2,7 @@
 
 This project contains a drop-in library for doing HTTP2 push on Google App Engine.
 
-Demo test: https://http20-experiment.appspot.com/
-
-![Effects of HTTP2 push performance](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg)
+Demo test site: https://http20-experiment.appspot.com/
 
 ## TL;DR quickstart
 
