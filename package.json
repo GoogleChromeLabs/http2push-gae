@@ -1,16 +1,19 @@
 {
   "name": "httppush",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "private": true,
   "main": "listelements.js",
   "scripts": {
     "postinstall" : "bower install"
   },
   "author": "Eric Bidelman - @ebidel",
-  "license": "ISC",
+  "license": "Apache2",
+  "engines": {
+    "node" : ">=1.0.0"
+  },
   "dependencies": {
     "dom5": "^1.1.1",
     "hydrolysis": "^1.15.4",
-    "vulcanize": "^1.10.3"
+    "vulcanize": "^1.13.1"
   }
 }

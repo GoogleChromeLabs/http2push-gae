@@ -1,10 +1,11 @@
 {
-  "name": "httppush",
+  "name": "httppush-gae",
   "version": "0.0.0",
   "authors": [
     "Eric Bidelman <ebidel@gmail.com>"
   ],
-  "license": "MIT",
+  "private": true,
+  "license": "Apache2",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -13,7 +14,7 @@
     "tests"
   ],
   "dependencies": {
-    "iron-elements": "PolymerElements/iron-elements#~1.0.3",
-    "paper-elements": "PolymerElements/paper-elements#~1.0.5"
+    "iron-elements": "PolymerElements/iron-elements#^1.0.3",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.5"
   }
 }

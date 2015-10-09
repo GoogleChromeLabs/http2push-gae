@@ -110,7 +110,6 @@ function treeToUrls(tree, accum) {
 }
 
 inputPath = path.join('/', path.relative(basePath, inputPath));
-// console.log(inputPath);
 
 exports.list = function() {
   return analyzer.metadataTree(inputPath).then(function(tree) {
@@ -120,4 +119,3 @@ exports.list = function() {
     console.log(error);
   });
 }
-

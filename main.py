@@ -13,94 +13,94 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-import json
+__author__ = 'Eric Bidelman <ebidel@>'
+
 import os
-import logging
-import re
-import time
 import webapp2
 
 from google.appengine.ext.webapp import template
 
+import http2push as http2
 
-class SlowHandler(webapp2.RequestHandler):
+# # TODO(ericbidelman): investigate + remove
+# # ATM, this is necessary to only add the vulcanized bundle URL when it's actually
+# # being requested by the browser. There appears to be a bug in GAE s.t. other
+# # files won't be pushed if one of the URLs is never requested by the browser.
+# # by the browser.
+# def fixup_for_vulcanize(vulcanize, urls):
+#   """Replaces element.html URL with a vulcanized version or
+#      elements.vulcanize.html with the unvulcanized version.
 
-  def get(self, f):
-    time.sleep(1) # simluate slow response.
-    self.response.headers['Cache-Control'] = 'private, max-age=100'
-    self.response.headers['Content-Type'] = 'text/css'
-    self.response.out.write('''
-body {
-  font-style: italic;
-}
-''')
+#     Args:
+#         vulcanize: True if the URL should be replaced by the vulcanized version.
+#         urls: A dict of url: priority mappings.
 
-class MainHandler(webapp2.RequestHandler):
+#     Returns:
+#         An update dict of URL mappings.
+#   """
 
-  def __generate_associate_content_header(self, urls):
-    # https://code.google.com/p/mod-spdy/wiki/OptimizingForSpdy
-    # The format of the header value is a comma-separated list of
-    # double-quoted URLs, each of which may optionally be followed by a
-    # colon and a SPDY priority number (from 0 to 7 inclusive). URL needs to be
-    # a full absolute URL. Whitespace between tokens
-    # is optional, and is ignored if present. For example:
-    #
-    #   X-Associated-Content: "https://www.example.com/styles/foo.css",
-    #       "/scripts/bar.js?q=4":2, "https://www.example.com/images/baz.png": 5,
-    #        "https://www.example.com/generate_image.php?w=32&h=24"
+#   # TODO: don't hardcode adding the vulcanized import bundle.
+#   UNVULCANIZED_FILE = 'elements.html'
+#   VULCANIZED_FILE = 'elements.vulcanize.html'
 
-    # Proposed header:
-    # http://blog.kazuhooku.com/2015/02/ann-h2o-version-092-released-incl.html
+#   for url,priority in urls.iteritems():
+#     if vulcanize is not None:
+#       if url.endswith(UNVULCANIZED_FILE):
+#         url = url.replace(UNVULCANIZED_FILE, VULCANIZED_FILE)
+#     else:
+#       if url.endswith(VULCANIZED_FILE):
+#         url = url.replace(VULCANIZED_FILE, UNVULCANIZED_FILE)
 
-    host = self.request.host_url
-    vulcanize = self.request.get('vulcanize', None)
+#   return urls
 
-    associate_content = []
-    for url,v in urls.iteritems():
-      url = str(url)
+# # Example - regular handler, explicitly setting headers.
+# class RegularHandler(http2.PushHandler):
 
-      # TODO: only add vulcanized bundle if being requested by the browser.
-      # This appears to be a bug in Chrome or GAE that stops app.css from
-      # being pushed if you have a file in the header that's never requested
-      # by the browser.
+#   def get(self):
+#     vulcanize = self.request.get('vulcanize', None)
 
-      # TODO: don't hardcode adding the vulcanized import bundle.
-      if vulcanize is not None:
-        if url.endswith('elements.html'):
-          url = url.replace('elements.html', 'elements.vulcanize.html')
-      else:
-        if url.endswith('elements.vulcanize.html'):
-          url = url.replace('elements.vulcanize.html', 'elements.html')
+#     # TODO: Remove (see above).
+#     #fixup_for_vulcanize(vulcanize, self.push_urls)
 
-      if v is not None:
-        associate_content.append('"%s%s":%s' % (host, url, str(v)))
-      else:
-        associate_content.append('"%s%s"' % (host, url))
+#     # HTTP2 server push resources?
+#     if self.request.get('nopush', None) is None:
 
-    associate_content = list(set(associate_content)) # remove duplicates
+#       # Send X-Associated-Content header.
+#       self.response.headers.add_header(
+#           'X-Associated-Content',
+#           self._generate_associate_content_header())
 
-    return ','.join(associate_content)
+#       # Send Link: <URL>; rel="preload" header.
+#       headers = self._generate_link_preload_headers()
+#       if type(headers) is list:
+#         for h in headers:
+#           self.response.headers.add_header('Link', h)
+#       else:
+#         self.response.headers.add_header('Link', headers)
 
+#     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+
+#     return self.response.out.write(template.render(path, {
+#       'vulcanize': vulcanize is not None
+#       }))
+
+class DecoratedHandler(http2.PushHandler):
+
+  @http2.push('push_manifest.json')
   def get(self):
     vulcanize = self.request.get('vulcanize', None)
 
-    # HTTP2 server push resources?
-    if self.request.get('nopush', None) is None:
-      with open('push_manifest.json') as f:
-        urls = json.loads(f.read())
-      associate_content_header = self.__generate_associate_content_header(urls)
-      self.response.headers.add_header('X-Associated-Content', associate_content_header)
+    # TODO: Remove (see above).
+    #fixup_for_vulcanize(vulcanize, self.push_urls)
 
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
 
-    self.response.out.write(template.render(path, {
+    return self.response.out.write(template.render(path, {
       'vulcanize': vulcanize is not None
       }))
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/css/(.*)', SlowHandler)
+    ('/', DecoratedHandler),
 ], debug=True)

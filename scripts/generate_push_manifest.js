@@ -19,33 +19,39 @@
 'use strict';
 
 var fs = require('fs');
-var listelements = require('./listelements');
+var listelements = require('./listresources');
 
 var PUSH_PRIORITY = 1; // TODO: this gives every resource priority 1.
 
-function generateAssociateContentHeader(urls) {
-  var associateContent = [];
+// function generateAssociateContentHeader(urls) {
+//   // X-Associated-Content: "https://www.example.com/styles/foo.css",
+//   //     "/scripts/bar.js":1,
 
-  for (var url in urls) {
-    var entry = '"' + url + '"';
-    var priority = urls[url];
-    if (priority !== null) {
-      entry += ':' +  priority;
-    }
-    associateContent.push(entry);
-  }
+//   var associateContent = [];
 
-  return associateContent.join(',');
-}
+//   for (var url in urls) {
+//     var entry = '"' + url + '"';
+//     var priority = urls[url];
+//     if (priority !== null) {
+//       entry += ':' +  priority;
+//     }
+//     associateContent.push(entry);
+//   }
+
+//   return associateContent.join(',');
+// }
 
 listelements.list().then(function(urls) {
-  console.log('== Resource URLs in this app ==');
+  console.log('== Found these resource URLs in this app ==');
+
   for (var i = 0, url; url = urls[i]; ++i) {
     console.log('  ', url);
   }
 
   var priorityMapping = {};
-  urls.map(function(url, i) { priorityMapping[url] = PUSH_PRIORITY; });
+  urls.map(function(url, i) {
+    priorityMapping[url] = PUSH_PRIORITY;
+  });
 
   var fileContent = JSON.stringify(priorityMapping, null, 2);
   fs.writeFile('push_manifest.json', fileContent, function(err) {
