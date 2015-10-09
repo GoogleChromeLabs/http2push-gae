@@ -15,7 +15,7 @@ Demo test: https://http20-experiment.appspot.com/
 That's it!
 
 The example server is written in Python. If you'd like to see other App Engine
-runtimes feel free to submit a pull request or visit the [EXPLAINER.md]
+runtimes feel free to submit a pull request or visit the [EXPLAINER](EXPLAINER.md)
 to read up on how to construct the `Link rel=preload` header yourself.
 
 <!--It also contains a script for generating a list of  static resources on a site, which is useful for generating the necessary HTTP header for push resources. -->
