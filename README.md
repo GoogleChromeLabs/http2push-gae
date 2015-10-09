@@ -1,31 +1,35 @@
 # HTTP 2.0 push on App Engine
 
-This project contains a reference server implementation for doing HTTP2
-push on Google App Engine. It also contains a script for generating a list of 
-static resources on a site, which is useful for generating the necessary HTTP header
-for push resources.
+This project contains a drop-in library for doing HTTP2 push on Google App Engine.
 
-Demo: https://http20-experiment.appspot.com/
+Demo test: https://http20-experiment.appspot.com/
 
 ![Effects of HTTP2 push performance](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/images/pushstats.jpg)
 
-### Perf results
+## TL;DR quickstart
 
-Full [WebPageTest results](http://www.webpagetest.org/video/compare.php?tests=150827_DY_13KF-l%3Anopush%2C150826_KA_1928-l%3Avulcanize%2C150826_YH_16K7-l%3Apush%2C150826_GQ_190C-l%3Avulcanize+(push)&thumbSize=100&ival=100&end=visual)
+1. Run `node ./scripts/generate_push_manifest.js static index.html`. This generates `push_manifest.json`, a list of static resources to push when index.html is requested.
+- Prune `push_manifest.json` as necessary. Also re-run `generate_push_manifest.js` when your list of resources changes. 
+- Annotate your page handlers with the `@http2push.push()` decorator. This will read + cache `push_manifest.json` and automatically construct the correct `Link: rel=preload` headers.
 
-TL;DR;
+That's it!
 
-- HTTP2 push means we no longer need to concat all our JS/CSS together in one file! This reduces the amount of required tooling to make a great, fast web app.
-- In my testing, the browser can handle smaller, indvidual files better than one large file. More testing needs to be done here, but the initial results are promising.
-- For HTML Import resources, we no longer need to run `vulcanize` (crushes subimports into a single file). In testing, the latter is actually slower. Boom!
-- In a world of web components, authors write components in a modular way using HTML Imports, a bit of CSS/JS, and markup. Push means we can ship our code _exactly_ as it was authored, minimizing the differences between dev and code shipped to production.
+The example server is written in Python. If you'd like to see other App Engine
+runtimes feel free to submit a pull request or visit the [EXPLAINER.md]
+to read up on how to construct the `Link rel=preload` header yourself.
+
+<!--It also contains a script for generating a list of  static resources on a site, which is useful for generating the necessary HTTP header for push resources. -->
 
 ## Requirements & Setup
 
 1. Download the [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll need the dev server.
-2. Node. But you already have it right!?
+- Node. But you already have it right!?
 
-### Setup
+### Installation in your project
+
+Get the code:
+
+    git clone https://github.com/GoogleChrome/http2push-gae http2push
 
 Install the dependencies:
 
@@ -34,49 +38,18 @@ Install the dependencies:
 Note: this will also run `bower install` after npm finishes. If that doesn't happen,
 be sure to run `bower install`
 
-## How to use HTTP2 push on App Engine
-
-App Engine support HTTP2 push with a special header, `X-Associated-Content`.
-The format of the header value is a comma-separated list of double-quoted URLs,
-each of which may optionally be followed by a colon and a SPDY priority number
-(from 0 to 7 inclusive). The **URL needs to be full absolute URL**. Whitespace
-between tokens is optional, and is ignored if present. For example:
-
-    X-Associated-Content: "https://www.example.com/styles/foo.css",
-        "/scripts/bar.js?q=4":2, "https://www.example.com/images/baz.png": 5,
-        "https://www.example.com/generate_image.php?w=32&h=24"
-
-**Note:** This header is not the spec'd standard `Link: <URL>; rel=preload` as
-described in [http://w3c.github.io/preload/](http://w3c.github.io/preload/).
-It's an older format used in SPDY.
-
-Also note, the `X-Associated-Content` header will be stripped in production
-App Engine. You won't see it on your requests. However, you'll be able to see it
-locally when testing on the dev server.
-
-### Verify resources are pushed
-
-To verify resources are being pushed on production GAE: 
-
-1. `chrome://net-internals` in Chrome.
-2. Change the dropdown to `HTTP/2`
-3. Reload your app URL
-4. Go back to `chrome://net-internals` and drill into your app.
-
-Pushed resources will show a `HTTP2_STREAM_ADOPTED_PUSH_STREAM` in the report.
-
 ## Generating a push manifest
 
 The `scripts` folder contains `generate_push_manifest.js`, a script for generating
 a JSON file (manifest) listing all of your app's static resources. **This file is not required
-by the HTTP2 protocol** but is useful for constructing the `X-Associated-Content` header
+by the HTTP2 protocol** but is useful for constructing the `Link: rel=preload` header
 on your server.
 
-**Example** - list all the tatic resources of `static/index.html`, include sub-HTML Imports:
+**Example** - list all the static resources of `static/index.html`, including sub-HTML Imports:
 
     node ./scripts/generate_push_manifest.js static index.html
 
-**Example** - list all the subimports in `static/elements/elements.html`:
+**Example** - list all the resources in `static/elements/elements.html`:
 
     node ./scripts/generate_push_manifest.js static/elements elements.html
 
@@ -94,27 +67,86 @@ or change the priority level.
       "/elements.vulcanize.html": 1
     }
 
-This file is used by the reference server to constructor the `X-Associated-Content` header.
-The server reads this file, appends the URL origin (to make an absolute URL),
-and servers the index.html page with with the constructed `X-Associated-Content` header.
+This file can be loaded by your server to constructor the `Link` header. When you
+use the provided `http2push` module, that's exact what it does!
 
-### Build it!
+## http2push drop-in server module
 
-Run the following script to vulcanize your app and generate `push_manifest.json`:
+The `http2push` module provides a base handler and decorator to use in your
+own server. The decorator is the simplest to integrate. Handlers which are annotated
+with the `@http2push.push()` decorator will server-push the resources in
+`push_manifest.json`.
 
-    ./scripts/build.sh
+**Example** - using the `push` decorator:
+
+    import os
+    import webapp2
+
+    from google.appengine.ext.webapp import template
+    import http2push as http2
+
+    class Handler(http2.PushHandler):
+
+      @http2.push() # push_manifest.json is used by default.
+      def get(self):
+        # Resources in push_manifest.json will be server-pushed with index.html.
+        path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+        return self.response.out.write()
+
+    app = webapp2.WSGIApplication([('/', Handler)])
+
+To use a custom manifest file name, use `@http2push.push('FILENAME')`.
+
+**Example** - using a custom manifest file:
+
+    import http2push
+
+    class Handler(http2push.PushHandler):
+
+      @http2push.push('custom_manifest.json')
+      def get(self):
+        ...
+
+For more control, you can also set the headers yourself.
+
+**Example** - Explicitly set `Link: rel=preload` (no decorators):
+
+    import http2push
+
+    class Handler(http2push.PushHandler):
+
+      def get(self):
+        # Optional: use custom manifest file.
+        # self.push_urls = http2push.use_push_manifest('custom_manifest.json')
+
+        headers = self._generate_link_preload_headers()
+        for h in headers:
+          self.response.headers.add_header('Link', h)
+
+        path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+        return self.response.out.write(template.render(path))
 
 ## Run the server
 
-Start the App Engine dev server:
+Start the App Engine dev server to see if everything went alright:
 
     dev_appserver.py --port 8080 .
 
-Open `http://localhost:8080/`. 
+Open `http://localhost:8080/`.
 
-## Deploy
+## Deployment (test site)
 
-To vulcanize imports and deploy to GAE, `deploy.sh` from the main directory:
+*Note: this section is only for maintainers of this project.*
+
+### Build it
+
+There's a one-stop convenience script to vulcanize the app and generate `push_manifest.json`:
+
+    ./scripts/build.sh
+
+### Deploy it
+
+Run `deploy.sh` to deploy the demo site. Note: `build.sh` is ran as part of this process.
 
     ./scripts/deploy.sh <VERSION>
 
