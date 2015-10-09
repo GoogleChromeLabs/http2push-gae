@@ -38,6 +38,13 @@ h1, h2 {
 header {
   margin-bottom: 24px;
 }
+h2, h4 {
+  margin: 0;
+  font-weight: 400;
+}
+h2 {
+  font-weight: 300;
+}
 a {
   text-decoration: none;
   color: #2979FF;
@@ -56,7 +63,7 @@ img {
 }
 footer {
   margin-top: 48px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
