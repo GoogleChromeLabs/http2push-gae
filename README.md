@@ -2,7 +2,7 @@
 
 This project contains a drop-in library for doing HTTP2 push on Google App Engine.
 
-Demo test site: https://http20-experiment.appspot.com/
+Demo test site: https://http2-push.appspot.com/
 
 ## TL;DR quickstart
 
