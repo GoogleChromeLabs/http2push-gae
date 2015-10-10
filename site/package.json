@@ -1,10 +1,12 @@
 {
-  "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "postinstall" : "bower install"
+  },
   "author": "Eric Bidelman - @ebidel",
   "license": "Apache2",
-  "scripts": {
-    "postinstall" : "cd site; npm install"
+  "engines": {
+    "node" : ">=1.0.0"
   },
   "dependencies": {
     "dom5": "^1.1.1",

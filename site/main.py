@@ -17,11 +17,13 @@
 __author__ = 'Eric Bidelman <ebidel@>'
 
 import os
+import sys
 import webapp2
 
 from google.appengine.ext.webapp import template
 
 import http2push as http2
+
 
 # TODO(ericbidelman): investigate + remove
 # ATM, this is necessary to only add the vulcanized bundle URL when it's actually

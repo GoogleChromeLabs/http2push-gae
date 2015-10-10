@@ -7,20 +7,20 @@ libraries:
   version: "2.5.2"
 
 handlers:
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
-  secure: always
+# - url: /favicon\.ico
+#   static_files: favicon.ico
+#   upload: favicon\.ico
+#   secure: always
 
-#- url: /$
-#  static_files: static/index.html
-#  upload: static/index.html
-  #http_headers:
-  #  X-Associated-Content: '"/js/app.js": 0'
+# - url: /$
+#   static_files: static/index.html
+#   upload: static/index.html
+#   http_headers:
+#     X-Associated-Content: '"/js/app.js": 0'
 
-- url: /css/slowfile.css
-  script: main.app
-  secure: always
+# - url: /css/slowfile.css
+#   script: main.app
+#   secure: always
 
 - url: /css
   static_dir: static/css

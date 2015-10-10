@@ -24,4 +24,4 @@ vulcanize $STATICDIR/elements.html --inline-script --inline-css \
     --strip-comments > $STATICDIR/elements.vulcanize.html
 
 echo '=== Generating HTTP2 push resource manifest ==='
-node $BASEDIR/generate_push_manifest.js $STATICDIR/ index.html
+node $BASEDIR/../../scripts/generate_push_manifest.js $STATICDIR/ index.html
