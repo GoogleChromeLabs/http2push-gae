@@ -29,4 +29,4 @@ $BASEDIR/build.sh
 
 echo "Deploying app version: $deployVersion"
 gcloud preview app deploy $BASEDIR/../app.yaml \
-    --project http20-experiment --version $deployVersion
+    --project http2-push --version $deployVersion
