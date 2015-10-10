@@ -23,82 +23,92 @@ from google.appengine.ext.webapp import template
 
 import http2push as http2
 
-# # TODO(ericbidelman): investigate + remove
-# # ATM, this is necessary to only add the vulcanized bundle URL when it's actually
-# # being requested by the browser. There appears to be a bug in GAE s.t. other
-# # files won't be pushed if one of the URLs is never requested by the browser.
-# # by the browser.
-# def fixup_for_vulcanize(vulcanize, urls):
-#   """Replaces element.html URL with a vulcanized version or
-#      elements.vulcanize.html with the unvulcanized version.
+# TODO(ericbidelman): investigate + remove
+# ATM, this is necessary to only add the vulcanized bundle URL when it's actually
+# being requested by the browser. There appears to be a bug in GAE s.t. other
+# files won't be pushed if one of the URLs is never requested by the browser.
+# by the browser.
+def fixup_for_vulcanize(vulcanize, urls):
+  """Replaces element.html URL with a vulcanized version or
+     elements.vulcanize.html with the unvulcanized version.
 
-#     Args:
-#         vulcanize: True if the URL should be replaced by the vulcanized version.
-#         urls: A dict of url: priority mappings.
+    Args:
+        vulcanize: True if the URL should be replaced by the vulcanized version.
+        urls: A dict of url: priority mappings.
 
-#     Returns:
-#         An update dict of URL mappings.
-#   """
+    Returns:
+        An update dict of URL mappings.
+  """
 
-#   # TODO: don't hardcode adding the vulcanized import bundle.
-#   UNVULCANIZED_FILE = 'elements.html'
-#   VULCANIZED_FILE = 'elements.vulcanize.html'
+  # TODO: don't hardcode adding the vulcanized import bundle.
+  UNVULCANIZED_FILE = 'elements.html'
+  VULCANIZED_FILE = 'elements.vulcanize.html'
 
-#   for url,priority in urls.iteritems():
-#     if vulcanize is not None:
-#       if url.endswith(UNVULCANIZED_FILE):
-#         url = url.replace(UNVULCANIZED_FILE, VULCANIZED_FILE)
-#     else:
-#       if url.endswith(VULCANIZED_FILE):
-#         url = url.replace(VULCANIZED_FILE, UNVULCANIZED_FILE)
+  push_urls = {}
 
-#   return urls
+  for k,v in urls.iteritems():
+    url = k
 
-# # Example - regular handler, explicitly setting headers.
-# class RegularHandler(http2.PushHandler):
+    if vulcanize is not None:
+      if k.endswith(UNVULCANIZED_FILE):
+        url = k.replace(UNVULCANIZED_FILE, VULCANIZED_FILE)
+    else:
+      if k.endswith(VULCANIZED_FILE):
+        url = k.replace(VULCANIZED_FILE, UNVULCANIZED_FILE)
 
-#   def get(self):
-#     vulcanize = self.request.get('vulcanize', None)
+    push_urls[url] = v
 
-#     # TODO: Remove (see above).
-#     #fixup_for_vulcanize(vulcanize, self.push_urls)
+  return push_urls
 
-#     # HTTP2 server push resources?
-#     if self.request.get('nopush', None) is None:
-
-#       # Send X-Associated-Content header.
-#       self.response.headers.add_header(
-#           'X-Associated-Content',
-#           self._generate_associate_content_header())
-
-#       # Send Link: <URL>; rel="preload" header.
-#       headers = self._generate_link_preload_headers()
-#       if type(headers) is list:
-#         for h in headers:
-#           self.response.headers.add_header('Link', h)
-#       else:
-#         self.response.headers.add_header('Link', headers)
-
-#     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-
-#     return self.response.out.write(template.render(path, {
-#       'vulcanize': vulcanize is not None
-#       }))
 
 class MainHandler(http2.PushHandler):
 
-  @http2.push('push_manifest.json')
   def get(self):
     vulcanize = self.request.get('vulcanize', None)
 
     # TODO: Remove (see above).
-    #fixup_for_vulcanize(vulcanize, self.push_urls)
+    push_urls = self.push_urls;
+    noextras = self.request.get('noextras', None)
+    if noextras is not None:
+      push_urls = fixup_for_vulcanize(vulcanize, self.push_urls)
+
+    # HTTP2 server push resources?
+    if self.request.get('nopush', None) is None:
+
+      # Send X-Associated-Content header.
+      self.response.headers.add_header(
+          'X-Associated-Content',
+          self._generate_associate_content_header(push_urls))
+
+      # Send Link: <URL>; rel="preload" header.
+      headers = self._generate_link_preload_headers(push_urls)
+      if type(headers) is list:
+        for h in headers:
+          self.response.headers.add_header('Link', h)
+      else:
+        self.response.headers.add_header('Link', headers)
 
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
 
     return self.response.out.write(template.render(path, {
       'vulcanize': vulcanize is not None
       }))
+
+# # Example - decorators.
+# class MainHandler(http2.PushHandler):
+
+#   @http2.push('push_manifest.json')
+#   def get(self):
+#     vulcanize = self.request.get('vulcanize', None)
+
+#     # TODO: Remove (see above).
+#     fixup_for_vulcanize(vulcanize, self.push_urls)
+
+#     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+
+#     return self.response.out.write(template.render(path, {
+#       'vulcanize': vulcanize is not None
+#       }))
 
 
 app = webapp2.WSGIApplication([
