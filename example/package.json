@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "author": "Eric Bidelman - @ebidel",
+  "license": "Apache2",
+  "engines": {
+    "node" : ">=1.0.0"
+  },
+  "dependencies": {
+    "dom5": "^1.1.1",
+    "hydrolysis": "^1.15.4",
+    "vulcanize": "^1.13.1"
+  }
+}

@@ -20,8 +20,8 @@ to read up on how to construct the `Link rel=preload` header yourself.
 
 ## Requirements & Setup
 
-1. Download the [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll need the dev server.
-- Node. But you already have it right!?
+1. [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll want the dev server for testing.
+- Node
 
 ### Installation in your project
 
@@ -89,7 +89,7 @@ with the `@http2push.push()` decorator will server-push the resources in
       def get(self):
         # Resources in push_manifest.json will be server-pushed with index.html.
         path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-        return self.response.out.write()
+        return self.response.out.write(template.render(path, {}))
 
     app = webapp2.WSGIApplication([('/', Handler)])
 
@@ -122,7 +122,7 @@ For more control, you can also set the headers yourself.
           self.response.headers.add_header('Link', h)
 
         path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-        return self.response.out.write(template.render(path))
+        return self.response.out.write(template.render(path, {}))
 
 ## Run the server
 
