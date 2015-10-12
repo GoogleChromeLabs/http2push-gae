@@ -17,9 +17,9 @@ Full [WebPageTest results](http://www.webpagetest.org/video/compare.php?tests=15
 
 TL;DR;
 
-- HTTP2 push means we no longer need to concat all our JS/CSS together in one file! This reduces the amount of required tooling to make a great, fast web app.
-- In my testing, the browser can handle smaller, indvidual files better than one large file. More testing needs to be done here, but the initial results are promising.
-- For HTML Import resources, we no longer need to run `vulcanize` (crushes subimports into a single file). In testing, the latter is actually slower. Boom!
+- HTTP2 push means we no longer need to concatenate all our JS/CSS together in one file! This reduces the amount of required tooling to make a great, fast web app.
+- In my testing, the browser can handle smaller, individual files better than one large file. More testing needs to be done here, but the initial results are promising.
+- For HTML Import resources, we no longer need to run `vulcanize` (crushes sub-imports into a single file). In testing, the latter is actually slower. Boom!
 - In a world of web components, authors write components in a modular way using HTML Imports, a bit of CSS/JS, and markup. Push means we can ship our code _exactly_ as it was authored, minimizing the differences between dev and code shipped to production.
 
 ## HTTP2 push on App Engine

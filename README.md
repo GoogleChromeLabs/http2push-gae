@@ -6,131 +6,124 @@ Demo test site: https://http2-push.appspot.com/
 
 ## TL;DR quickstart
 
-1. Run `node ./scripts/generate_push_manifest.js static index.html`. This generates `push_manifest.json`, a list of static resources to push when index.html is requested.
-- Prune `push_manifest.json` as necessary. Also re-run `generate_push_manifest.js` when your list of resources changes. 
-- Annotate your page handlers with the `@http2push.push()` decorator. This will read + cache `push_manifest.json` and automatically construct the correct `Link: rel=preload` headers.
+1. Generate a `push_manifest.json` using a node script, [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest). See below.
+- Annotate your request handlers with the `@http2push.push()` decorator.
 
-That's it!
-
-The example server is written in Python. If you'd like to see other App Engine
-runtimes feel free to submit a pull request or visit the [EXPLAINER](EXPLAINER.md)
-to read up on how to construct the `Link rel=preload` header yourself.
-
-<!--It also contains a script for generating a list of  static resources on a site, which is useful for generating the necessary HTTP header for push resources. -->
+Your resources will be pushed by http2. That's it!
 
 ## Requirements & Setup
 
 1. [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll want the dev server for testing.
 - Node
 
-### Installation in your project
+The example server is written in Python. If you'd like to see other App Engine
+runtimes feel free to submit a pull request or visit the [EXPLAINER](EXPLAINER.md)
+to read up on how to construct the `Link rel=preload` header yourself.
 
-Get the code:
+### Run the test server
 
-    git clone https://github.com/GoogleChrome/http2push-gae http2push
+`example/` contains a fully working example of an App Engine Python server that
+uses http2push.py. You'll also see an example `push_manifest.json` in that folder.
 
-Install the dependencies:
+To try the test server, start the App Engine dev server in the `example` folder:
 
-    npm install
+    cd example
+    dev_appserver.py --port 8080 .
 
-Note: this will also run `bower install` after npm finishes. If that doesn't happen,
-be sure to run `bower install`
+Open `http://localhost:8080/`. 
 
-## Generating a push manifest
+**Important** the dev server does not support http2 push. An app needs to be
+deployed to production App Engine.
 
-The `scripts` folder contains `generate_push_manifest.js`, a script for generating
-a JSON file (manifest) listing all of your app's static resources. **This file is not required
-by the HTTP2 protocol** but is useful for constructing the `Link: rel=preload` header
-on your server.
+## Installation in your project
 
-**Example** - list all the static resources of `static/index.html`, including sub-HTML Imports:
+1. Get the drop-in library: `git clone https://github.com/GoogleChrome/http2push-gae`
+- Move `http2push-gae/http2push.py` into your project folder.
+- Install [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest) script: `npm install http2-push-manifest --save-dev`
 
-    node ./scripts/generate_push_manifest.js static index.html
+## Using
 
-**Example** - list all the resources in `static/elements/elements.html`:
+### Generating a push manifest
 
-    node ./scripts/generate_push_manifest.js static/elements elements.html
+This project uses [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest)
+to generate the list of files to push. The JSON file is loaded by `http2push.py`
+to constructor the `Link` header.
 
-The script generates `push_manifest.json` in the top level directory with a
-mapping of `<URL>: <PUSH_PRIORITY>`. Feel free to add/remove URLs as necessary
-or change the priority level.
+Re-run the script whenever your list of resources changes. An easy way to do that
+is by adding a script to your project's `package.json`.
 
-    {
-      "/css/app.css": 1,
-      "/js/app.js": 1,
-      "/bower_components/webcomponentsjs/webcomponents-lite.js": 1,
-      "/bower_components/iron-selector/iron-selection.html": 1,
-      ...
-      "/elements.html": 1,
-      "/elements.vulcanize.html": 1
+For example, assuming `app/index.html` is your main page, you could add:
+
+    "scripts": {
+      "push": "http2-push-manifest app index.html"
     }
 
-This file can be loaded by your server to constructor the `Link` header. When you
-use the provided `http2push` module, that's exact what it does!
+An run `npm run push` to re-generate the file.
 
-## http2push drop-in server module
+Read[http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest)'s
+full documentation for more information on generating the manifest.
 
-The `http2push` module provides a base handler and decorator to use in your
+### Using the http2push server module
+
+The `http2push.py` module provides a base handler and decorator to use in your
 own server. The decorator is the simplest to integrate. Handlers which are annotated
 with the `@http2push.push()` decorator will server-push the resources in
 `push_manifest.json`.
 
-**Example** - using the `push` decorator:
+**Example** - using the decorator:
 
-    import os
-    import webapp2
+```python
+import os
+import webapp2
 
-    from google.appengine.ext.webapp import template
-    import http2push as http2
+from google.appengine.ext.webapp import template
+import http2push as http2
 
-    class Handler(http2.PushHandler):
+class Handler(http2.PushHandler):
 
-      @http2.push() # push_manifest.json is used by default.
-      def get(self):
-        # Resources in push_manifest.json will be server-pushed with index.html.
-        path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-        return self.response.out.write(template.render(path, {}))
+  @http2.push() # push_manifest.json is used by default.
+  def get(self):
+    # Resources in push_manifest.json will be server-pushed with index.html.
+    path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+    return self.response.out.write(template.render(path, {}))
 
-    app = webapp2.WSGIApplication([('/', Handler)])
+app = webapp2.WSGIApplication([('/', Handler)])
+```
 
 To use a custom manifest file name, use `@http2push.push('FILENAME')`.
 
 **Example** - using a custom manifest file:
 
-    import http2push
+```python
+import http2push
 
-    class Handler(http2push.PushHandler):
+class Handler(http2push.PushHandler):
 
-      @http2push.push('custom_manifest.json')
-      def get(self):
-        ...
+  @http2push.push('custom_manifest.json')
+  def get(self):
+    ...
+```
 
 For more control, you can also set the headers yourself.
 
 **Example** - Explicitly set `Link: rel=preload` (no decorators):
 
-    import http2push
+```python
+import http2push
 
-    class Handler(http2push.PushHandler):
+class Handler(http2push.PushHandler):
 
-      def get(self):
-        # Optional: use custom manifest file.
-        # self.push_urls = http2push.use_push_manifest('custom_manifest.json')
+  def get(self):
+    # Optional: use custom manifest file.
+    # self.push_urls = http2push.use_push_manifest('custom_manifest.json')
 
-        headers = self._generate_link_preload_headers()
-        for h in headers:
-          self.response.headers.add_header('Link', h)
+    headers = self._generate_link_preload_headers()
+    for h in headers:
+      self.response.headers.add_header('Link', h)
 
-        path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-        return self.response.out.write(template.render(path, {}))
-
-## Run the server
-
-Start the App Engine dev server to see if everything went alright:
-
-    dev_appserver.py --port 8080 .
-
-Open `http://localhost:8080/`.
+    path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+    return self.response.out.write(template.render(path, {}))
+```
 
 ## Deployment (test site)
 
