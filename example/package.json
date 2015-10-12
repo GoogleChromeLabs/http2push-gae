@@ -3,11 +3,15 @@
   "author": "Eric Bidelman - @ebidel",
   "license": "Apache2",
   "engines": {
-    "node" : ">=1.0.0"
+    "node": ">=1.0.0"
   },
-  "dependencies": {
+  "scripts": {
+    "push": "http2-push-manifest static index.html"
+  },
+  "devDependencies": {
     "dom5": "^1.1.1",
     "hydrolysis": "^1.15.4",
-    "vulcanize": "^1.13.1"
+    "vulcanize": "^1.13.1",
+    "http2-push-manifest": "0.0.1"
   }
 }
