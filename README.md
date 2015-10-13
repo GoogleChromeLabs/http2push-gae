@@ -4,7 +4,7 @@ This project contains a drop-in library for doing HTTP2 push on Google App Engin
 
 Demo test site: https://http2-push.appspot.com/
 
-## TL;DR quickstart
+## TL;DR how it works
 
 1. Generate a `push_manifest.json` using a node script, [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest). See below.
 - Annotate your request handlers with the `@http2push.push()` decorator.
@@ -41,7 +41,7 @@ Open `http://localhost:8080/`.
 - Move `http2push-gae/http2push.py` into your project folder.
 - Install [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest) script: `npm install http2-push-manifest --save-dev`
 
-## Using
+## Usage
 
 ### Generating a push manifest
 
