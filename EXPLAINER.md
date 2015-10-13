@@ -11,7 +11,7 @@ The client can also ask for resource that it knows it will need by using:
 
 The performance benefits of doing this for critical resources is very promising.
 
-![Effects of HTTP2 push performance](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/static/site/images/pushstats.jpg)
+![Effects of HTTP2 push performance](https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/pushstats.jpg)
 
 Full [WebPageTest results](http://www.webpagetest.org/video/compare.php?tests=150827_DY_13KF-l%3Anopush%2C150826_KA_1928-l%3Avulcanize%2C150826_YH_16K7-l%3Apush%2C150826_GQ_190C-l%3Avulcanize+(push)&thumbSize=100&ival=100&end=visual)
 
