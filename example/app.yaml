@@ -16,6 +16,13 @@ handlers:
   static_dir: static/js
   secure: always
 
+- url: /static
+  static_files: static/static.html
+  upload: static/static.html
+  http_headers:
+    X-Associated-Content: '"/js/app.js": 1, "/css/app.css": 1' # Need both headers for now.
+    Link: '</js/app.js>; rel="preload", </css/app.css>; rel="preload"'
+
 - url: .*
   script: main.app
   secure: always

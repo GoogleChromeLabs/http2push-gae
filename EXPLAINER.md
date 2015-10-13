@@ -52,3 +52,5 @@ To verify resources are being pushed on production GAE:
 4. Go back to `chrome://net-internals` and drill into your app.
 
 Pushed resources will show a `HTTP2_STREAM_ADOPTED_PUSH_STREAM` in the report.
+
+<a href="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/netinternals.png" target="_blak"><img src="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/netinternals.png" alt="chrome://net-internals"></a>

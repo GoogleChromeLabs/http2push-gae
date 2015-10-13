@@ -20,7 +20,10 @@ The example server is written in Python. If you'd like to see other App Engine
 runtimes feel free to submit a pull request or visit the [EXPLAINER](EXPLAINER.md)
 to read up on how to construct the `Link rel=preload` header yourself.
 
-### Run the test server
+### Run the example server
+
+**Important** the dev server does not support http2 push. An app needs to be
+deployed to production App Engine.
 
 `example/` contains a fully working example of an App Engine Python server that
 uses http2push.py. You'll also see an example `push_manifest.json` in that folder.
@@ -32,10 +35,7 @@ To try the test server, start the App Engine dev server in the `example` folder:
 
 Open `http://localhost:8080/`. 
 
-**Important** the dev server does not support http2 push. An app needs to be
-deployed to production App Engine.
-
-## Installation in your project
+## Installing in your project
 
 1. Get the drop-in library: `git clone https://github.com/GoogleChrome/http2push-gae`
 - Move `http2push-gae/http2push.py` into your project folder.
@@ -63,14 +63,46 @@ An run `npm run push` to re-generate the file.
 Read[http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest)'s
 full documentation for more information on generating the manifest.
 
-### Using the http2push server module
+### Drop in the http2push server module
 
 The `http2push.py` module provides a base handler and decorator to use in your
 own server. The decorator is the simplest to integrate. Handlers which are annotated
 with the `@http2push.push()` decorator will server-push the resources in
 `push_manifest.json`.
 
+> **Tip** - when testing your pages, the `?nopush` URL parameter disables push.
+Use this parameter to test the effectiveness of server push on your own resources
+or to run performance tests at webpagetest.org.
+
 **Example** - using the decorator:
+
+app.yaml:
+
+```yaml
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: webapp2
+  version: "latest"
+
+handlers:
+
+- url: /css
+  static_dir: static/css
+  secure: always
+
+- url: /js
+  static_dir: static/js
+  secure: always
+
+- url: .*
+  script: main.app
+  secure: always
+```
+
+main.py:
 
 ```python
 import os
@@ -125,6 +157,34 @@ class Handler(http2push.PushHandler):
     return self.response.out.write(template.render(path, {}))
 ```
 
+## Pushing content from a static handler
+
+If you don't have a dynamic script handler, you can still push resources from
+App Engine page by setting the `http_headers` on your static page handler in app.yaml.
+
+app.yaml:
+
+```yaml
+...
+
+handlers:
+
+- url: /css
+  static_dir: static/css
+  secure: always
+
+- url: /js
+  static_dir: static/js
+  secure: always
+
+- url: /$
+  static_files: path/to/index.html
+  upload: path/to/index.html
+  http_headers:
+    X-Associated-Content: '"/js/app.js": 1, "/css/app.css": 1' # Need both headers for now.
+    Link: '</js/app.js>; rel="preload", </css/app.css>; rel="preload"'
+```
+
 ## Deployment (test site)
 
 *Note: this section is only for maintainers of this project.*
@@ -133,6 +193,7 @@ class Handler(http2push.PushHandler):
 
 There's a one-stop convenience script to vulcanize the app and generate `push_manifest.json`:
 
+    cd site
     ./scripts/build.sh
 
 ### Deploy it
