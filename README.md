@@ -11,8 +11,6 @@ Demo test site: https://http2-push.appspot.com/
 
 <a href="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/pushgaehowto.jpg" target="_blak"><img src="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/pushgaehowto.jpg" alt="How this works"></a>
 
-That's it!
-
 ## Requirements & Setup
 
 1. [App Engine Python SDK](https://cloud.google.com/appengine/downloads?hl=en). You'll want the dev server for testing.
