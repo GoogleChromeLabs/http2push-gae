@@ -9,7 +9,9 @@ Demo test site: https://http2-push.appspot.com/
 1. Generate a `push_manifest.json` using a node script, [http2-push-manifest](https://www.npmjs.com/package/http2-push-manifest). See below.
 - Annotate your request handlers with the `@http2push.push()` decorator.
 
-Your resources will be pushed by http2. That's it!
+<a href="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/pushgaehowto.jpg" target="_blak"><img src="https://raw.githubusercontent.com/GoogleChrome/http2push-gae/master/site/static/img/pushgaehowto.jpg" alt="How this works"></a>
+
+That's it!
 
 ## Requirements & Setup
 
