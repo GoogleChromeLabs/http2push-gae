@@ -85,7 +85,7 @@ threadsafe: yes
 
 libraries:
 - name: webapp2
-  version: "latest"
+  version: latest
 
 handlers:
 
