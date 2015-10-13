@@ -61,4 +61,5 @@ skip_files:
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
 - ^(.*/)?node_modules/.*
+- ^(.*/)?tests/.*
 - ^.*.md|markdown
