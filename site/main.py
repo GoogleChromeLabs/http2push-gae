@@ -79,19 +79,9 @@ class MainHandler(http2.PushHandler):
 
     # HTTP2 server push resources?
     if self.request.get('nopush', None) is None:
-
-      # Send X-Associated-Content header.
-      self.response.headers.add_header(
-          'X-Associated-Content',
-          self._generate_associate_content_header(push_urls))
-
-      # Send Link: <URL>; rel="preload" header.
-      headers = self._generate_link_preload_headers(push_urls)
-      if type(headers) is list:
-        for h in headers:
-          self.response.headers.add_header('Link', h)
-      else:
-        self.response.headers.add_header('Link', headers)
+      # Send Link: <URL>; rel=preload header.
+      header = self._generate_link_preload_headers(push_urls)
+      self.response.headers.add_header('Link', header)
 
     template = JINJA_ENVIRONMENT.get_template('static/index.html')
 

@@ -56,6 +56,8 @@ class PushHandler(webapp2.RequestHandler):
   def _generate_associate_content_header(self, urls=None):
     """Constructs a value for the X-Associated-Content header.
 
+    Deprecated. Use _generate_link_preload_headers instead.
+
     The format of the header value is a comma-separated list of double-quoted
     URLs, each of which may optionally be followed by a colon and a SPDY
     priority number (from 0 to 7 inclusive). URL needs to be a full absolute
@@ -118,18 +120,18 @@ class PushHandler(webapp2.RequestHandler):
 
     preload_links = []
     for url,v in urls.iteritems():
-      url = '%s%s' % (host, str(url))  # Construct absolute URLs.
+      # Construct absolute URLs. Not really needed, but spec only contains full URLs.
+      url = '%s%s' % (host, str(url))
       t = str(v.get('type', ''))
       if len(t):
-        preload_links.append('<%s>; rel="preload"; as="%s"' % (url, t))
+        preload_links.append('<%s>; rel=preload; as=%s' % (url, t))
       else:
-        preload_links.append('<%s>; rel="preload"' % url)
+        preload_links.append('<%s>; rel=preload' % url)
 
     headers = list(set(preload_links)) # remove duplicates
 
-    # TODO: check that implementations support a single Link header with
-    # with commma separated values.
-    return headers # ','.join(headers)
+    # GAE supports single Link header.
+    return ','.join(headers)
 
 """
 Example:
@@ -152,10 +154,6 @@ def push(manifest=PUSH_MANIFEST):
       instance = args[0]
       # nopush URL param prevents the Link header from being included.
       if instance.request.get('nopush', None) is None and len(push_urls):
-        # Send X-Associated-Content header.
-        instance.response.headers.add_header('X-Associated-Content',
-              instance._generate_associate_content_header(push_urls))
-
         preload_headers = instance._generate_link_preload_headers(push_urls)
         if type(preload_headers) is list:
           for h in preload_headers:

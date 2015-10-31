@@ -30,7 +30,7 @@ class MainHandler(http2.PushHandler):
   @http2.push('push_manifest.json')
   def get(self):
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-    return self.response.out.write(template.render(path, {}))
+    return self.response.write(template.render(path, {}))
 
 
 app = webapp2.WSGIApplication([
