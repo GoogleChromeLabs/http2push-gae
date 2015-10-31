@@ -20,8 +20,7 @@ handlers:
   static_files: static/static.html
   upload: static/static.html
   http_headers:
-    X-Associated-Content: '"/js/app.js": 1, "/css/app.css": 1' # Need both headers for now.
-    Link: '</js/app.js>; rel="preload", </css/app.css>; rel="preload"'
+    Link: '</js/app.js>; rel=preload; as=script, </css/app.css>; rel=preload; as=style'
 
 - url: .*
   script: main.app

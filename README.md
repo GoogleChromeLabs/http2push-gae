@@ -55,7 +55,7 @@ is by adding a script to your project's `package.json`.
 For example, assuming `app/index.html` is your main page, you could add:
 
     "scripts": {
-      "push": "http2-push-manifest app index.html"
+      "push": "http2-push-manifest -f app/index.html"
     }
 
 An run `npm run push` to re-generate the file.
@@ -117,7 +117,7 @@ class Handler(http2.PushHandler):
   def get(self):
     # Resources in push_manifest.json will be server-pushed with index.html.
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-    return self.response.out.write(template.render(path, {}))
+    return self.response.write(template.render(path, {}))
 
 app = webapp2.WSGIApplication([('/', Handler)])
 ```
@@ -154,7 +154,7 @@ class Handler(http2push.PushHandler):
       self.response.headers.add_header('Link', h)
 
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
-    return self.response.out.write(template.render(path, {}))
+    return self.response.write(template.render(path, {}))
 ```
 
 ## Pushing content from a static handler
@@ -181,8 +181,7 @@ handlers:
   static_files: path/to/index.html
   upload: path/to/index.html
   http_headers:
-    X-Associated-Content: '"/js/app.js": 1, "/css/app.css": 1' # Need both headers for now.
-    Link: '</js/app.js>; rel="preload", </css/app.css>; rel="preload"'
+    Link: '</js/app.js>; rel=preload; as=script, </css/app.css>; rel=preload; as=style'
 ```
 
 ## Deployment (test site)
