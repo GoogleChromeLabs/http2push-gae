@@ -18,11 +18,14 @@ __author__ = 'Eric Bidelman <ebidel@>'
 
 import os
 import sys
+import jinja2
 import webapp2
 
-from google.appengine.ext.webapp import template
-
 import http2push as http2
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
+    )
 
 
 # TODO(ericbidelman): investigate + remove
@@ -90,9 +93,9 @@ class MainHandler(http2.PushHandler):
       else:
         self.response.headers.add_header('Link', headers)
 
-    path = os.path.join(os.path.dirname(__file__), 'static/index.html')
+    template = JINJA_ENVIRONMENT.get_template('static/index.html')
 
-    return self.response.out.write(template.render(path, {
+    return self.response.write(template.render({
       'vulcanize': vulcanize is not None
       }))
 
@@ -108,7 +111,7 @@ class MainHandler(http2.PushHandler):
 
 #     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
 
-#     return self.response.out.write(template.render(path, {
+#     return self.response.write(template.render(path, {
 #       'vulcanize': vulcanize is not None
 #       }))
 

@@ -1,4 +1,10 @@
 {
-  "/css/app.css": 1,
-  "/js/app.js": 1
+  "/css/app.css": {
+    "weight": 1,
+    "type": "style"
+  },
+  "/js/app.js": {
+    "weight": 1,
+    "type": "script"
+  }
 }

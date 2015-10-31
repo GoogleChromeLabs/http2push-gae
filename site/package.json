@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "postinstall": "bower install",
-    "push": "http2-push-manifest static index.html"
+    "push": "http2-push-manifest -f static/index.html"
   },
   "author": "Eric Bidelman - @ebidel",
   "license": "Apache2",
@@ -15,6 +15,6 @@
     "vulcanize": "^1.13.1"
   },
   "devDependencies": {
-    "http2-push-manifest": "0.0.1"
+    "http2-push-manifest": "^1.0.0"
   }
 }
