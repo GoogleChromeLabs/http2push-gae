@@ -86,10 +86,11 @@ class PushHandler(webapp2.RequestHandler):
     for url,v in urls.iteritems():
       url = '%s%s' % (host, str(url)) # Construct absolute URLs.
 
-      if v is None:
+      weight = v.get('weight', None)
+      if weight is None:
         associate_content.append('"%s"' % url)
       else:
-        associate_content.append('"%s":%s' % (url, str(v)))
+        associate_content.append('"%s":%s' % (url, weight))
 
     headers = list(set(associate_content)) # remove duplicates
 
@@ -101,7 +102,7 @@ class PushHandler(webapp2.RequestHandler):
     The format of the preload header is described in the spec
     http://w3c.github.io/preload/:
 
-      Link: <https://example.com/font.woff>; rel=preload;
+      Link: <https://example.com/font.woff>; rel=preload; as=font
 
     Args:
         url: A list of urls to use in the header.
@@ -116,9 +117,13 @@ class PushHandler(webapp2.RequestHandler):
     host = self.request.host_url
 
     preload_links = []
-    for url in urls:
+    for url,v in urls.iteritems():
       url = '%s%s' % (host, str(url))  # Construct absolute URLs.
-      preload_links.append('<%s>; rel="preload"' % url)
+      t = str(v.get('type', ''))
+      if len(t):
+        preload_links.append('<%s>; rel="preload"; as="%s"' % (url, t))
+      else:
+        preload_links.append('<%s>; rel="preload"' % url)
 
     headers = list(set(preload_links)) # remove duplicates
 
