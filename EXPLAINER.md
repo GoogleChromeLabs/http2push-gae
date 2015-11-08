@@ -24,7 +24,7 @@ TL;DR;
 
 ## HTTP2 push on App Engine
 
-GAE supports the standard preload header! 
+GAE supports the `Link rel=preload` header! **The max number of resources you can push is currently 10.**
 
 ### Verify resources are pushed
 
