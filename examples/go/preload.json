@@ -1,0 +1,13 @@
+{
+  "/": {
+    "/app.css": {
+      "type": "style"
+    },
+    "/app.js": {
+      "type": "script"
+    },
+    "/img.png": {
+      "type": "image"
+    }
+  }
+}
