@@ -20,17 +20,18 @@ The example server is written in Python. If you'd like to see other App Engine
 runtimes feel free to submit a pull request or visit the [EXPLAINER](EXPLAINER.md)
 to read up on how to construct the `Link rel=preload` header yourself.
 
-### Run the example server
+### Run the example server(s)
 
 **Important** the dev server does not support http2 push. An app needs to be
 deployed to production App Engine.
 
-`example/` contains a fully working example of an App Engine Python server that
-uses http2push.py. You'll also see an example `push_manifest.json` in that folder.
+`example/` contains a fully working example of an App Engine Python server and Go
+servers. This walk-through will use the Python server, which uses the
+http2push.py library. You'll also see an example `examples/python/push_manifest.json` in that folder.
 
 To try the test server, start the App Engine dev server in the `example` folder:
 
-    cd example
+    cd example/python
     dev_appserver.py --port 8080 .
 
 Open `http://localhost:8080/`. 

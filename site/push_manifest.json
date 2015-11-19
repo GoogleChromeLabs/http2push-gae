@@ -1,0 +1,50 @@
+{
+  "/css/app.css": {
+    "weight": 1,
+    "type": "style"
+  },
+  "/js/app.js": {
+    "weight": 1,
+    "type": "script"
+  },
+  "/bower_components/webcomponentsjs/webcomponents-lite.min.js": {
+    "weight": 1,
+    "type": "script"
+  },
+  "/bower_components/iron-selector/iron-selection.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/iron-selector/iron-selectable.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/iron-selector/iron-multi-selectable.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/polymer/polymer-micro.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/polymer/polymer-mini.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/polymer/polymer.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/bower_components/iron-selector/iron-selector.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/elements.html": {
+    "weight": 1,
+    "type": "document"
+  },
+  "/elements.vulcanize.html": {
+    "weight": 1,
+    "type": "document"
+  }
+}
