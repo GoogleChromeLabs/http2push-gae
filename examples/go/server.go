@@ -43,6 +43,9 @@ func handleGopher(w http.ResponseWriter, r *http.Request) {
 	if r.TLS != nil {
 		s = "https"
 	}
+	// the next line will add the following header:
+	// Link: <host/gopher.png>; rel=preload; as=image
 	http2preload.AddHeader(w.Header(), s, r.Host, assets)
+	// respond with minimal HTML5, omitting <html> and <body>
 	fmt.Fprintf(w, `<img src="%s">`, gopher)
 }
