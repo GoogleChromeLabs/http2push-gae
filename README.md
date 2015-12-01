@@ -150,9 +150,8 @@ class Handler(http2push.PushHandler):
     # Optional: use custom manifest file.
     # self.push_urls = http2push.use_push_manifest('custom_manifest.json')
 
-    headers = self._generate_link_preload_headers()
-    for h in headers:
-      self.response.headers.add_header('Link', h)
+    header = self._generate_link_preload_headers()
+    self.response.headers.add_header('Link', header)
 
     path = os.path.join(os.path.dirname(__file__), 'static/index.html')
     return self.response.write(template.render(path, {}))
