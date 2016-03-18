@@ -1,4 +1,4 @@
-## HTTP2 push improvest performance
+## HTTP2 push improves performance
 
 HTTP2 allows servers to preemptively push resources at high priority to the
 client by using a header:
