@@ -153,7 +153,7 @@ def push(manifest=PUSH_MANIFEST):
     def wrapper(*args, **kwargs):
       instance = args[0]
       # nopush URL param prevents the Link header from being included.
-      if instance.request.get('nopush', None) is None and len(push_urls):
+      if instance.request.get('nopush', None) is None and push_urls:
         preload_headers = instance._generate_link_preload_headers(push_urls)
         if type(preload_headers) is list:
           for h in preload_headers:
